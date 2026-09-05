@@ -1,0 +1,55 @@
+﻿@inherits LayoutComponentBase
+@inject IJSRuntime JS
+<div class="page @ThemeClass">
+    <NavMenu IsCollapsed="sidebarCollapsed" />
+
+    <main>
+        <div class="top-row px-4">
+            <button type="button" class="sidebar-toggle" title="@(sidebarCollapsed ? "Show sidebar" : "Hide sidebar")" aria-label="@(sidebarCollapsed ? "Show sidebar" : "Hide sidebar")" aria-expanded="@(!sidebarCollapsed)" @onclick="ToggleSidebar">
+                <span aria-hidden="true">@(sidebarCollapsed ? ">>" : "<<")</span>
+            </button>
+            <button type="button" class="theme-toggle" title="@(IsDarkMode ? "Use light theme" : "Use dark theme")" aria-label="@(IsDarkMode ? "Use light theme" : "Use dark theme")" @onclick="ToggleTheme">
+                <span aria-hidden="true">@(IsDarkMode ? "○" : "●")</span>
+                @(IsDarkMode ? "Light" : "Dark")
+            </button>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+    private bool sidebarCollapsed;
+    private bool? darkMode;
+    private bool devicePrefersDark;
+
+    private bool IsDarkMode => darkMode ?? devicePrefersDark;
+
+    private string ThemeClass => darkMode switch
+    {
+        true => "theme-dark",
+        false => "theme-light",
+        null => string.Empty
+    };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            devicePrefersDark = await JS.InvokeAsync<bool>("getDevicePrefersDark");
+            StateHasChanged();
+        }
+    }
+
+    private void ToggleSidebar()
+    {
+        sidebarCollapsed = !sidebarCollapsed;
+    }
+
+    private void ToggleTheme()
+    {
+        darkMode = !IsDarkMode;
+    }
+}

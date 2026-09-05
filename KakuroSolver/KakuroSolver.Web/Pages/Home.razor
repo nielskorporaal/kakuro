@@ -1,0 +1,125 @@
+﻿@page "/"
+@implements IAsyncDisposable
+
+<PageTitle>Kakuro deduction lab</PageTitle>
+
+<main class="solver-shell" tabindex="0" autofocus @onkeydown="HandleKeyDown" @onkeydown:preventDefault="true">
+	<header class="hero">
+		<div>
+			<p class="eyebrow">KAKURO / HUMAN MODE</p>
+			<h1 class="ink">Watch the puzzle think.</h1>
+		</div>
+		<div class="status-chip">@(loading ? "Loading puzzle" : $"Step {selectedStep} / {deductions.Count}")</div>
+	</header>
+
+	<section class="upload-panel">
+		<div>
+			<p class="eyebrow">LOAD A PUZZLE</p>
+			<h2 class="ink">Bring your own board</h2>
+			<p>Upload a whitespace-separated Kakuro text file. The parser runs locally in your browser.</p>
+		</div>
+		<label class="upload-button">
+			<span>Choose .txt file</span>
+			<InputFile OnChange="HandleFileSelected" accept=".txt,text/plain" />
+		</label>
+		@if (!string.IsNullOrWhiteSpace(fileName))
+		{
+			<span class="file-name">@fileName</span>
+		}
+	</section>
+
+	@if (error is not null)
+	{
+		<section class="error-panel">@error</section>
+	}
+	else if (loading)
+	{
+		<section class="loading-panel">Preparing deduction history...</section>
+	}
+	else
+	{
+		<section class="workspace">
+			<div class="board-panel">
+				<div class="panel-heading">
+					<div>
+						<p class="eyebrow">PUZZLE</p>
+					</div>
+					<span class="run-count">@puzzle!.N x @puzzle.M · @deductions.Count deductions</span>
+				</div>
+				<div class="kakuro-grid" style="grid-template-columns: repeat(@puzzle.M, minmax(0, 1fr));">
+					@for (var row = 0; row < puzzle.N; row++)
+					{
+						@for (var column = 0; column < puzzle.M; column++)
+						{
+							var cell = puzzle.Cells[row][column];
+							<div class="grid-cell @CellClass(cell)" title="Row @(row + 1), column @(column + 1)">
+								@CellText(cell, row, column)
+							</div>
+						}
+					}
+				</div>
+			</div>
+
+			<aside class="inspector">
+				<div class="panel-heading compact">
+					<div>
+						<p class="eyebrow">DEDUCTIONS</p>
+					</div>
+				</div>
+				@if (selectedStep == 0)
+				{
+					<div class="empty-inspector">
+						<span class="step-mark">00</span>
+						<p>View the next state to reveal the first run-combination deduction.</p>
+					</div>
+				}
+				else
+				{
+					var deduction = deductions[selectedStep - 1];
+					<div class="deduction-card">
+						<span class="step-mark">@selectedStep.ToString("00")</span>
+						<h3>@deduction.Method</h3>
+						<p>@deduction.Direction run · target <strong>@deduction.RunTarget</strong></p>
+						<p class="explanation">@deduction.Explanation</p>
+						<div class="change-line">
+							<span>@FormatCandidates(deduction.Before)</span>
+							<span class="arrow">→</span>
+							<span class="after">@FormatCandidates(deduction.After)</span>
+						</div>
+						<p class="cell-ref">Cell (@(deduction.Cell.Row + 1), @(deduction.Cell.Column + 1))</p>
+					</div>
+				}
+
+				<div class="controls">
+					<button class="control-button" @onclick="Previous" disabled="@IsAtStart">← Previous</button>
+					<button class="control-button primary" @onclick="Next" disabled="@IsAtEnd">Next →</button>
+				</div>
+				<input class="timeline" type="range" min="0" max="@deductions.Count" value="@selectedStep" @oninput="Seek" />
+				<div class="timeline-labels"><span>Start</span><span>End</span></div>
+			</aside>
+		</section>
+
+		<section class="timeline-panel">
+			<div class="panel-heading compact">
+				<div>
+					<p class="eyebrow">REPLAY</p>
+				</div>
+				<span class="run-count">Click on a step to jump</span>
+			</div>
+			<div class="step-list">
+				<button class="@StepClass(selectedStep == 0)" @onclick="() => SelectStep(0)">
+					<span>00</span><strong>Initial candidate field</strong><small>All unsolved cells begin with 1–9</small>
+				</button>
+				@for (var index = 0; index < deductions.Count; index++)
+				{
+					var step = index + 1;
+					var deduction = deductions[index];
+						<button class="@StepClass(selectedStep == step)" @onclick="() => SelectStep(step)">
+						<span>@step.ToString("00")</span><strong>@deduction.Method</strong><small>@deduction.Direction run @deduction.RunTarget · @deduction.Explanation</small>
+					</button>
+				}
+			</div>
+		</section>
+	}
+</main>
+
