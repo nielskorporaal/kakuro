@@ -1,6 +1,6 @@
-namespace KakuroSolver;
+namespace KakuroSolver.Core;
 
-public sealed record HumanDeduction(
+public sealed record Deduction(
     string Method,
     int RunTarget,
     string Direction,
@@ -9,12 +9,12 @@ public sealed record HumanDeduction(
     IReadOnlySet<int> After,
     string Explanation);
 
-public sealed class HumanSolver
+public sealed class Solver
 {
     private readonly KakuroGrid grid;
     private readonly Dictionary<(int Row, int Column), HashSet<int>> candidates = new();
 
-    public HumanSolver(KakuroGrid grid)
+    public Solver(KakuroGrid grid)
     {
         this.grid = grid ?? throw new ArgumentNullException(nameof(grid));
 
@@ -35,7 +35,7 @@ public sealed class HumanSolver
     public IReadOnlyDictionary<(int Row, int Column), IReadOnlySet<int>> Candidates =>
         candidates.ToDictionary(pair => pair.Key, pair => (IReadOnlySet<int>)pair.Value);
 
-    public bool TryNext(out HumanDeduction? deduction)
+    public bool TryNext(out Deduction? deduction)
     {
         foreach (var run in grid.KakuroRuns)
         {
@@ -65,7 +65,7 @@ public sealed class HumanSolver
                     var direction = run.Cells.Count > 1 && run.Cells[0].Row == run.Cells[1].Row
                         ? "horizontal"
                         : "vertical";
-                    deduction = new HumanDeduction(
+                    deduction = new Deduction(
                         "Run combinations",
                         run.Target,
                         direction,

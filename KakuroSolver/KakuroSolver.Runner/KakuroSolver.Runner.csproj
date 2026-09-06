@@ -8,9 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="KakuroSolver.Core\KakuroSolver.Core.csproj" />
-    <Compile Remove="Types.cs;KakuroParser.cs;HumanSolver.cs" />
-    <None Update="Input\kakuro-1.txt">
+    <ProjectReference Include="..\KakuroSolver.Core\KakuroSolver.Core.csproj" />
+    <None Include="..\Input\*.txt" Link="Input\%(Filename)%(Extension)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

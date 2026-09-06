@@ -1,4 +1,4 @@
-using KakuroSolver;
+using KakuroSolver.Core;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
@@ -11,7 +11,7 @@ public partial class Home : IAsyncDisposable
     private HttpClient Http { get; set; } = default!;
 
     private KakuroGrid? puzzle;
-    private readonly List<HumanDeduction> deductions = [];
+    private readonly List<Deduction> deductions = [];
     private readonly List<IReadOnlyDictionary<(int Row, int Column), IReadOnlySet<int>>> states = [];
     private int selectedStep;
     private bool loading = true;
@@ -69,9 +69,9 @@ public partial class Home : IAsyncDisposable
 
     private void LoadPuzzle(string text, string name)
     {
-        var parsedPuzzle = KakuroParser.Parse(text);
-        var solver = new HumanSolver(parsedPuzzle);
-        var recordedDeductions = new List<HumanDeduction>();
+        var parsedPuzzle = Parser.Parse(text);
+        var solver = new Solver(parsedPuzzle);
+        var recordedDeductions = new List<Deduction>();
         var recordedStates = new List<IReadOnlyDictionary<(int Row, int Column), IReadOnlySet<int>>>
         {
             CopyCandidates(solver.Candidates)

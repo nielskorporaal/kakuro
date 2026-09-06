@@ -6,10 +6,4 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Include="..\Types.cs" Link="Types.cs" />
-    <Compile Include="..\KakuroParser.cs" Link="KakuroParser.cs" />
-    <Compile Include="..\HumanSolver.cs" Link="HumanSolver.cs" />
-  </ItemGroup>
-
 </Project>

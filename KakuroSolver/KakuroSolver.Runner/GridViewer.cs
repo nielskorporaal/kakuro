@@ -1,6 +1,8 @@
-namespace KakuroSolver;
+using KakuroSolver.Core;
 
-public static class KakuroGridViewer
+namespace KakuroSolver.Runner;
+
+public static class GridViewer
 {
     public static void Print(KakuroGrid grid, TextWriter writer)
     {

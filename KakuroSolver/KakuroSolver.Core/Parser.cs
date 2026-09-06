@@ -1,8 +1,8 @@
 using System.Globalization;
 
-namespace KakuroSolver;
+namespace KakuroSolver.Core;
 
-public static class KakuroParser
+public static class Parser
 {
     public static KakuroGrid Parse(string text)
     {

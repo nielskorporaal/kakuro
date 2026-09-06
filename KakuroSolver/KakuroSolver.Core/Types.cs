@@ -1,4 +1,4 @@
-namespace KakuroSolver;
+namespace KakuroSolver.Core;
 
 // A kakuro grid consists of cells in a grid size N x M. Cells can either be a clue cell or a puzzle cell. 
 // A clue cell can contain two values (one for horizontal clues, the other for vertical clues)
